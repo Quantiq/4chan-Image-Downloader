@@ -15,7 +15,9 @@
 # - - Set the thread update time
 # - - quiet mode
 # - - return images with original file names.
-# - - Monitor Multiple Threads (Be careful for API constraints)
+# - - Monitor Multiple Threads (Be careful for API constraints here)
+#
+#
 # written by Quantiq.
 
 from urllib.request import urlopen
@@ -29,11 +31,11 @@ import argparse
 def main():
 
     input_board = 'wg' #input("Input the board: ")
-    input_thread = '7005687' #input("Input the thread ID: ")
-    original_filename_option = True
+    input_thread = '7007090' #input("Input the thread ID: ")
+    original_filename_option = True #input here
 
     try:
-        input_folder = '{} - {} - '.format(input_board, input_thread) + js['posts'][0]['sub']
+        input_folder = '{} - {} - '.format(input_board, input_thread) + js['posts'][0]['sub'] #broken. js is not defined.
     except:
         input_folder = '{} - {} '.format(input_board, input_thread)
 
@@ -47,21 +49,15 @@ def main():
 
     thread_monitor(input_board, input_thread, input_folder, original_filename_option)
 
+#def thread_download
+    #my code here
+
 def thread_monitor(board, thread, folder, original_filename_option):
 
     while True:
 
         print('Checking thread for updates...')
         dl_num = image_downloader(board, thread, folder, original_filename_option)
-        # newlist, _ = list_update(board, thread) # to ignore second part of tuple.
-
-        # for i in newlist:
-        #     url_pic = 'https://i.4cdn.org/' + board + '/' + i
-        #     if os.path.exists(folder + '/' + i) == False:
-        #         dl_num += 1
-        #         print("Downloading /{}/{}...".format(board, i))
-        #         urlretrieve(url_pic, folder + '/' + i)
-        #         sleep(1)
 
         if dl_num == 0:
             print('Nothing to Update. Waiting 60 seconds...')
