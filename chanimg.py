@@ -6,15 +6,15 @@
 # - Fix OS Error on Folder exists -Done!
 # - Return images with original filenames. -Done!
 # - Combine the two scripts. -Done!
-# - Allow user to imput custom amount of time for updates. -Done!
+# - Allow user to input custom amount of time for updates. -Done!
 # - Try to break the script on an input instead of ctrl-X and write a timer. -Done!
 # - Combine the two scripts -Done!
 # - Write a functional argument parser and options. -Done!
 #
 # To Do:
-# - quiet mode
+# - Quiet mode
 # - Monitor Multiple Threads (Be careful for API constraints here)
-# - 
+# - Only download images greater than a certain size.
 #
 # written by Quantiq.
 
