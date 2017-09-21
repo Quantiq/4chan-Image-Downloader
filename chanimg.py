@@ -1,22 +1,4 @@
-# ChanImg 0.11
-#
-# Changelog / Fixes:
-# - Try to monitor a thread. -Done!
-# - Write a timer. -Done!
-# - Fix OS Error on Folder exists -Done!
-# - Return images with original filenames. -Done!
-# - Combine the two scripts. -Done!
-# - Allow user to input custom amount of time for updates. -Done!
-# - Try to break the script on an input instead of ctrl-X and write a timer. -Done!
-# - Combine the two scripts -Done!
-# - Write a functional argument parser and options. -Done!
-#
-# To Do:
-# - Quiet mode
-# - Monitor Multiple Threads (Be careful for API constraints here)
-# - Only download images greater than a certain size.
-#
-# written by Quantiq.
+#!/usr/bin/env python3
 
 from time import sleep
 
@@ -25,7 +7,7 @@ import argparse
 import json
 import urllib.request
 
-#Global: Parsing
+'''Global Argument Parsing'''
 parser = argparse.ArgumentParser(prog='chanimg', usage='%(prog)s url [optional arguments]', description='ChanImg is a simple command-line 4chan image downloader written in Python.')
 
 parser.add_argument('url', type=str, help='Downloads images from a given input URL.')
@@ -33,8 +15,6 @@ parser.add_argument('-m', '--monitor', action='store_true', help='Monitors a spe
 parser.add_argument('-u', '--update', metavar='', default=60, type=int, help='Specifies the amount of time in seconds to update a thread. (Default: 60)')
 parser.add_argument('-o', '--original', action='store_true', help='Saves images as original filenames.')
 parser.add_argument('-f', '--foldername', type=str, default=None, help='Save images to a specified folder name.')
-
-parser.add_argument('--debug', action='store_true', help='Debugging tools.')
 
 args = parser.parse_args()
 
@@ -46,7 +26,7 @@ def link_parse(url):
     return url + '.json'
 
 def board_parse(url):
-    '''Because 4chan doesn't include the fucking board name in its API, here is some weird fuckery that grabs it from the URL.'''
+    '''4chan doesn't include the board name in its API, so here is some weird string parsing that grabs it from the URL.'''
     x = url.find('.org') + 5
     y = url.find('thread') - 1
 
@@ -93,7 +73,7 @@ def list_maker(js):
     '''Makes a list if image urls based on the input JSON.'''
     pair_list = []
 
-    # Dumb way of getting the number of replies in a thread
+    '''Dumb way of getting the number of replies in a thread'''
     count = js['posts'][0]['replies'] + 1
 
     for i in range(count):
@@ -154,10 +134,12 @@ def dl_status(dl_num):
             print('Downloaded {} image.'.format(dl_num))
         else:
             print('Downloaded {} images.'.format(dl_num))
+
+    print('')
     return
 
 def timer(time):
-
+    '''Sleeps for specified amount of time.'''
     for i in range(time):
         try:
             print('Waiting... Press Ctrl + C to exit.', end='\r', flush=True)
@@ -170,7 +152,6 @@ def timer(time):
 
 def thread_download(folder, js, board):
     '''Single instance downloader'''
-
     print("Checking thread for images to download...")
 
     pairlist = list_maker(js)
@@ -182,7 +163,7 @@ def thread_download(folder, js, board):
 def thread_monitor(folder, js, board):
     '''Main Thread monitoring'''
 
-    # Checks to make sure JSON is not loaded on first call.
+    '''Checks to make sure JSON is not loaded on first call.'''
     do_not_load_json = True
 
     while True:
@@ -200,10 +181,6 @@ def thread_monitor(folder, js, board):
         do_not_load_json = False
 
 if __name__ == '__main__':
-
-    if args.debug == True:
-        print(args)
-
     if args.update < 10:
         print('Update value must be set to 10 seconds or higher.')
         exit()
