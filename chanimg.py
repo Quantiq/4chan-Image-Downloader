@@ -8,13 +8,13 @@ import json
 import urllib.request
 
 '''Global Argument Parsing'''
-parser = argparse.ArgumentParser(prog='chanimg', usage='%(prog)s url [optional arguments]', description='ChanImg is a simple command-line 4chan image downloader written in Python.')
+parser = argparse.ArgumentParser(prog='chanimg', usage='%(prog)s url [optional arguments]', description='Chanimg is a simple command-line 4chan image downloader written in Python.')
 
 parser.add_argument('url', type=str, help='Downloads images from a given input URL.')
 parser.add_argument('-m', '--monitor', action='store_true', help='Monitors a specified thread.')
 parser.add_argument('-u', '--update', metavar='', default=60, type=int, help='Specifies the amount of time in seconds to update a thread. (Default: 60)')
 parser.add_argument('-o', '--original', action='store_true', help='Saves images as original filenames.')
-parser.add_argument('-f', '--foldername', type=str, default=None, help='Save images to a specified folder name.')
+parser.add_argument('-f', '--foldername', type=str, default=None, help='Save images to a custom folder name.')
 
 args = parser.parse_args()
 
@@ -61,9 +61,9 @@ def make_folder(thread_json, board):
         input_folder = input_folder.replace('/', '')
 
     '''Try making a folder'''
-    if os.path.exists('output/' + input_folder) == False:
+    if os.path.exists('Output/' + input_folder) == False:
         try:
-            os.makedirs('output/' + input_folder)
+            os.makedirs('Output/' + input_folder)
         except OSError:
             print('Something went wrong while trying to make your folder.')
 
@@ -110,10 +110,10 @@ def image_downloader(folder, pair_list, board):
         url_pic = 'https://i.4cdn.org/' + board + '/' + dl_name
 
         '''Checks if file exists'''
-        if os.path.exists('output/' + folder + '/' + name_option) == False:
+        if os.path.exists('Output/' + folder + '/' + name_option) == False:
             dl_num += 1
             print("Downloading {}...".format(orig_name))
-            urllib.request.urlretrieve(url_pic, 'output/' + folder + '/' + name_option)
+            urllib.request.urlretrieve(url_pic, 'Output/' + folder + '/' + name_option)
             sleep(1)
     return dl_num
 
