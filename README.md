@@ -12,8 +12,10 @@ Chanimg will save images to a folder under /Output as "(board id) - (thread numb
 
 <code>-m, --monitor</code> Monitors a thread.
 
-<code>-u, --update TIME</code> Specifies the amount of time in seconds to update a thread. (Default: 60)
+<code>-u, --update TIME</code> Specifies the amount of time in seconds to update a thread (Default: 60). Higher values are recommended for slow boards.
 
 <code>-o, --original</code> Saves images as original filenames.
 
 <code>-f, --foldername "NAME"</code> Save images to a custom folder name.
+
+<code>-v, --verbose </code> Increase output verbosity.

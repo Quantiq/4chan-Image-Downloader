@@ -7,16 +7,20 @@ import argparse
 import json
 import urllib.request
 
-'''Global Argument Parsing'''
-parser = argparse.ArgumentParser(prog='chanimg', usage='%(prog)s url [optional arguments]', description='Chanimg is a simple command-line 4chan image downloader written in Python.')
+def get_args():
+    '''Argument Parsing'''
+    parser = argparse.ArgumentParser(prog='chanimg', usage='%(prog)s url [optional arguments]', description='Chanimg is a simple command-line 4chan image downloader written in Python.')
 
-parser.add_argument('url', type=str, help='Downloads images from a given input URL.')
-parser.add_argument('-m', '--monitor', action='store_true', help='Monitors a specified thread.')
-parser.add_argument('-u', '--update', metavar='', default=60, type=int, help='Specifies the amount of time in seconds to update a thread. (Default: 60)')
-parser.add_argument('-o', '--original', action='store_true', help='Saves images as original filenames.')
-parser.add_argument('-f', '--foldername', type=str, default=None, help='Save images to a custom folder name.')
+    parser.add_argument('url', type=str, help='Downloads images from a given input URL.')
+    parser.add_argument('-m', '--monitor', action='store_true', help='Monitors a specified thread.')
+    parser.add_argument('-u', '--update', metavar='[time]', default=60, type=int, help='Specifies the amount of time in seconds to update a thread. (Default: 60)')
+    parser.add_argument('-o', '--original', action='store_true', help='Saves images as original filenames.')
+    parser.add_argument('-f', '--foldername', metavar='[name]', type=str, default=None, help='Save images to a custom folder name.')
+    parser.add_argument('-v', '--verbose', action='store_true', help='Increase verbosity of output.')
 
-args = parser.parse_args()
+    args = parser.parse_args()
+
+    return args
 
 def link_parse(url):
     '''Converts thread URL to JSON URL'''
@@ -56,7 +60,7 @@ def make_folder(thread_json, board):
     else:
         input_folder = args.foldername
 
-    '''replaces '/' in foldername string'''
+    '''sanitizes '/' in foldername string to prevent nesting.'''
     if '/' in input_folder:
         input_folder = input_folder.replace('/', '')
 
@@ -70,7 +74,7 @@ def make_folder(thread_json, board):
     return input_folder
 
 def list_maker(js):
-    '''Makes a list if image urls based on the input JSON.'''
+    '''Makes a list of image urls to download from based on the input JSON.'''
     pair_list = []
 
     '''Dumb way of getting the number of replies in a thread'''
@@ -101,7 +105,7 @@ def image_downloader(folder, pair_list, board):
         orig_name = pair[0]
         dl_name = pair[1]
 
-        '''Downloads original filenames if the user has selected'''
+        '''Downloads original filenames if the user has selected to be True'''
         if args.original == True:
             name_option = orig_name
         else:
@@ -112,7 +116,8 @@ def image_downloader(folder, pair_list, board):
         '''Checks if file exists'''
         if os.path.exists('Output/' + folder + '/' + name_option) == False:
             dl_num += 1
-            print("Downloading {}...".format(orig_name))
+            if args.verbose == True:
+                print("Downloading {}...".format(orig_name))
             urllib.request.urlretrieve(url_pic, 'Output/' + folder + '/' + name_option)
             sleep(1)
     return dl_num
@@ -146,7 +151,7 @@ def timer(time):
             sleep(1)
         except KeyboardInterrupt:
             print('')
-            print('Exiting program.')
+            print('Exiting.')
             exit()
     return
 
@@ -163,7 +168,7 @@ def thread_download(folder, js, board):
 def thread_monitor(folder, js, board):
     '''Main Thread monitoring'''
 
-    '''Checks to make sure JSON is not loaded on first call.'''
+    '''Checks to make sure JSON is not loaded twice for the first download instance.'''
     do_not_load_json = True
 
     while True:
@@ -181,6 +186,9 @@ def thread_monitor(folder, js, board):
         do_not_load_json = False
 
 if __name__ == '__main__':
+
+    args = get_args()
+
     if args.update < 10:
         print('Update value must be set to 10 seconds or higher.')
         exit()
