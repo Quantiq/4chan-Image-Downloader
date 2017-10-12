@@ -8,7 +8,7 @@ import json
 import urllib.request
 
 def get_args():
-    '''Argument Parsing'''
+    '''Parses commandline arguments passed to the program.'''
     parser = argparse.ArgumentParser(prog='chanimg', usage='%(prog)s url [optional arguments]', description='Chanimg is a simple command-line 4chan image downloader written in Python.')
 
     parser.add_argument('url', type=str, help='Downloads images from a given input URL.')
@@ -23,7 +23,7 @@ def get_args():
     return args
 
 def link_parse(url):
-    '''Converts thread URL to JSON URL'''
+    '''Converts thread URL to usable JSON URL'''
     url = url.replace('boards', 'a')
     url = url.replace('4chan', '4cdn')
 
@@ -77,7 +77,7 @@ def list_maker(js):
     '''Makes a list of image urls to download from based on the input JSON.'''
     pair_list = []
 
-    '''Dumb way of getting the number of replies in a thread'''
+    '''Grabs the number of replies in a thread'''
     count = js['posts'][0]['replies'] + 1
 
     for i in range(count):
@@ -97,15 +97,40 @@ def list_maker(js):
 
     return pair_list
 
-def image_downloader(folder, pair_list, board):
-    '''Main image downloading program.'''
-    dl_num = 0
+def check_for_duplicates(folder, pair_list):
+    '''Checks the pair_list for duplicates in specified folder.'''
+    dl_list = []
 
     for pair in pair_list:
+
         orig_name = pair[0]
         dl_name = pair[1]
 
-        '''Downloads original filenames if the user has selected to be True'''
+        if args.original == True:
+            name_option = orig_name
+        else:
+            name_option = dl_name
+
+        if os.path.exists('Output/' + folder + '/' + name_option) == False:
+            dl_list.append(pair)
+
+    return dl_list
+
+def image_downloader(folder, pair_list, board):
+    '''Main image downloading program.'''
+    dl_list = check_for_duplicates(folder, pair_list)
+
+    dl_num = 0
+
+    if args.verbose == False and len(dl_list) != 0:
+        print("Downloading {} images...".format(len(dl_list)))
+
+    for pair in dl_list:
+        dl_num += 1
+
+        orig_name = pair[0]
+        dl_name = pair[1]
+
         if args.original == True:
             name_option = orig_name
         else:
@@ -113,13 +138,12 @@ def image_downloader(folder, pair_list, board):
 
         url_pic = 'https://i.4cdn.org/' + board + '/' + dl_name
 
-        '''Checks if file exists'''
-        if os.path.exists('Output/' + folder + '/' + name_option) == False:
-            dl_num += 1
-            if args.verbose == True:
-                print("Downloading {}...".format(orig_name))
-            urllib.request.urlretrieve(url_pic, 'Output/' + folder + '/' + name_option)
-            sleep(1)
+        if args.verbose == True:
+            print("Downloading {} of {} | {}...".format(dl_num, len(dl_list), orig_name))
+
+        urllib.request.urlretrieve(url_pic, 'Output/' + folder + '/' + name_option)
+        sleep(1)
+
     return dl_num
 
 def dl_status(dl_num):
